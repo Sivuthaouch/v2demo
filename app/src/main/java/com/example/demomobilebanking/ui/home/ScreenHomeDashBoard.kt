@@ -945,8 +945,11 @@ fun AppearanceBottomSheet() {
                     checkedThumbColor = Color.White,
                     checkedTrackColor = Color.Blue,
                     uncheckedThumbColor = Color.White,
-                    uncheckedTrackColor = Color.Gray,
-                )
+                    checkedBorderColor = Color.Transparent,
+                    uncheckedBorderColor = Color.Transparent
+
+                ),
+                modifier = Modifier.padding(end = 16.dp)
             )
         }
     }
