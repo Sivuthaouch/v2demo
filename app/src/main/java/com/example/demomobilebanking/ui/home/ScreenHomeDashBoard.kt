@@ -1,11 +1,13 @@
 package com.example.demomobilebanking.ui.home
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,16 +33,35 @@ import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +71,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,15 +84,17 @@ import com.example.demomobilebanking.Contact
 import com.example.demomobilebanking.DashBoardModel
 import com.example.demomobilebanking.Promotion
 import com.example.demomobilebanking.R
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Serializable
 data object DashBoard: NavKey
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenHomeDashBoard(
     modifier: Modifier = Modifier,
-){
-
+    ){
+    var showSheet by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -212,7 +236,22 @@ fun ScreenHomeDashBoard(
                     color = Color(0xFFF5F9FF)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Appearance()
+                Appearance(
+                    onCostomize = {
+                        showSheet = true
+                    }
+                )
+                if (showSheet){
+                    ModalBottomSheet(
+                        onDismissRequest = { showSheet = false},
+                        dragHandle = {
+
+                        }
+                    ) {
+                        AppearanceBottomSheet()
+                    }
+                }
+
             }
 
         }
@@ -666,8 +705,11 @@ fun NewAndOffer(){
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Appearance () {
+fun Appearance (
+    onCostomize : () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -721,7 +763,7 @@ fun Appearance () {
                         )
                         .weight(1f)
                 )
-                Box(
+                Box (
                     modifier = Modifier
                         .padding(top =16.dp)
                         .border(
@@ -731,7 +773,13 @@ fun Appearance () {
                             shape = RoundedCornerShape(20.dp)
                         )
                         .weight(1f)
-
+                        .clickable(
+                            interactionSource = remember {
+                                MutableInteractionSource()
+                            },
+                            indication = ripple(),
+                            onClick = onCostomize
+                        )
                 ){
                     Text(
                         modifier = Modifier.padding(
@@ -746,24 +794,174 @@ fun Appearance () {
                 }
             }
         }
+
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppearanceBottomSheet(){
-    val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
+fun AppearanceBottomSheet() {
+    var checked by remember { mutableStateOf(value = true) }
+    Column(
+        modifier = Modifier
+            .background(
+                color = Color(0xFF5F9FF),
+                shape = RoundedCornerShape(10.dp)
+            )
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .height(354.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+
+    ) {
+
+        Text(
+            text = "Appearance",
+            fontWeight = FontWeight.W500,
+            fontSize = 14.sp,
+            modifier = Modifier
+                .padding(16.dp)
+        )
+        Row(
+            modifier = Modifier
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(10.dp)
+                )
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(35.5.dp, alignment = Alignment.CenterHorizontally)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.img_defult_theme),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(
+                        width = 53.dp,
+                        height = 121.dp
+                    )
+            )
+            Image(
+                painter = painterResource(R.drawable.img_angkor_theme),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(
+                        width = 53.dp,
+                        height = 121.dp
+                    )
+            )
+            Image(
+                painter = painterResource(R.drawable.img_golden_theme),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(
+                        width = 53.dp,
+                        height = 121.dp
+                    )
+            )
+            Image(
+                painter = painterResource(R.drawable.img_chinese_theme),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(
+                        width = 53.dp,
+                        height = 121.dp
+                    )
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier
+                .padding()
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(10.dp)
+                )
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_text_aa),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(start = 16.dp),
+                    text = "Text Size"
+                )
+            }
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_right),
+                contentDescription = null,
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .padding(end = 16.dp)
+
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier
+                .padding()
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(10.dp)
+                )
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_nav_history),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+
+                    )
+                Text(
+                    modifier = Modifier
+                        .padding(start = 16.dp),
+                    text = "Recent Transaction"
+                )
+            }
+            Switch(
+                checked = checked,
+                onCheckedChange = {
+                    checked = it
+                },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White,
+                    checkedTrackColor = Color.Blue,
+                    uncheckedThumbColor = Color.White,
+                    uncheckedTrackColor = Color.Gray,
+                )
+            )
+        }
+    }
 }
-
-
 @Preview(showBackground = true)
 @Composable
 fun AppearanceBottomSheetPreview(){
     AppearanceBottomSheet()
+
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ScreenHomeDashBoardPreview(){
-    ScreenHomeDashBoard()
+    ScreenHomeDashBoard(
+
+    )
 }
