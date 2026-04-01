@@ -1,6 +1,6 @@
 package com.example.demomobilebanking.ui.home
 
-import android.graphics.drawable.Icon
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -17,50 +17,35 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,9 +54,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -84,7 +68,6 @@ import com.example.demomobilebanking.Contact
 import com.example.demomobilebanking.DashBoardModel
 import com.example.demomobilebanking.Promotion
 import com.example.demomobilebanking.R
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -96,7 +79,7 @@ fun ScreenHomeDashBoard(
     ){
     var showSheet by remember { mutableStateOf(false) }
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
     ){
         Image(
@@ -237,7 +220,7 @@ fun ScreenHomeDashBoard(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Appearance(
-                    onCostomize = {
+                    onCustomizeClick = {
                         showSheet = true
                     }
                 )
@@ -259,50 +242,55 @@ fun ScreenHomeDashBoard(
 }
 
 @Composable
-fun DashBoardMenu(){
-    val items = arrayListOf(
-        DashBoardModel(
-            id = "001",
-            label = "Account",
-            iconRes = R.drawable.ic_account
-        ),
-        DashBoardModel(
-            id = "002",
-            label = "Transfer",
-            iconRes = R.drawable.ic_transfer
-        ),
-        DashBoardModel(
-            id = "003",
-            label = "Payment",
-            iconRes = R.drawable.ic_payment
-        ),
-        DashBoardModel(
-            id = "004",
-            label = "Deposit",
-            iconRes = R.drawable.ic_deposit
-        ), DashBoardModel(
-            id = "005",
-            label = "Loan",
-            iconRes = R.drawable.ic_loan
-        ), DashBoardModel(
-            id = "006",
-            label = "Card",
-            iconRes = R.drawable.ic_card
-        ),
-    )
+fun DashBoardMenu(
+    modifier: Modifier = Modifier
+){
+    val items = remember {
+        arrayListOf(
+            DashBoardModel(
+                id = "001",
+                label = "Account",
+                iconRes = R.drawable.ic_account
+            ),
+            DashBoardModel(
+                id = "002",
+                label = "Transfer",
+                iconRes = R.drawable.ic_transfer
+            ),
+            DashBoardModel(
+                id = "003",
+                label = "Payment",
+                iconRes = R.drawable.ic_payment
+            ),
+            DashBoardModel(
+                id = "004",
+                label = "Deposit",
+                iconRes = R.drawable.ic_deposit
+            ), DashBoardModel(
+                id = "005",
+                label = "Loan",
+                iconRes = R.drawable.ic_loan
+            ), DashBoardModel(
+                id = "006",
+                label = "Card",
+                iconRes = R.drawable.ic_card
+            ),
+        )
+    }
     Column(
-        modifier = Modifier
-            .padding(start = 16.dp, end = 16.dp),
+        modifier = modifier
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items.chunked(3).forEach { rowItems ->
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                rowItems.forEach { i ->
+                rowItems.forEach { item ->
                     Column(
                         modifier = Modifier
                             .weight(1f)
+                            .aspectRatio(ratio = 1f)
                             .border(
                                 border = BorderStroke(
                                     width = 1.dp, color = Color.White
@@ -312,31 +300,24 @@ fun DashBoardMenu(){
                         ,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        IconButton(
-                            onClick = {},
+                        Icon(
+                            painterResource(item.iconRes),
+                            contentDescription = null,
+                            tint = Color.Unspecified,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    vertical = 16.dp
-                                ),
-
-
-
-                        ) {
-                            Icon(
-                                painter = painterResource(i.iconRes),
-                                contentDescription = null,
-                                tint = Color.Unspecified
-                            )
-                        }
+                                .padding(horizontal = 28.17.dp)
+                                .padding(top = 16.dp)
+                                .size(
+                                    size = 50.dp
+                                )
+                        )
                         Text(
-                            modifier = Modifier.padding(bottom = 8.dp),
-                            text = i.label,
+                            modifier = Modifier.padding(top = 6.dp),
+                            text = item.label,
                             fontWeight = FontWeight.W500,
                             fontSize = 14.sp,
                             color = Color(0xFFF5F9FF),
-
-                        )
+                            )
                     }
                 }
             }
@@ -509,17 +490,19 @@ fun RecentTransaction(
     contacts: List<Contact>
 ){
 
-    val contacts = listOf(
-        Contact(initials = "Jack", name = "Jack", Color(0xFF2D9CDB)),
-        Contact(initials = "SS", name =  "Sok Sok...", Color(0xFFFF2D7A)),
-        Contact(initials = "DK", name = "Dy Kosal", Color(0xFFFFB800)),
-        Contact(initials = "SP", name = "Seng Ph...", Color(0xFF6C2DFF)),
-        Contact(initials = "LK", name = "Leang K...", Color(0xFF2DB7D8)),
-        Contact(initials = "J", name = "Jack", Color(0xFF2DB7D8)),
-        Contact(initials = "J", name = "Jack", Color(0xFF2DB7D8)),
-        Contact(initials = "J", name = "Jack", Color(0xFF2DB7D8)),
-        Contact(initials = "J", name = "Jack", Color(0xFF2DB7D8))
-    )
+    val contacts = remember {
+        listOf(
+            Contact(initials = "Jack", name = "Jack", Color(0xFF2D9CDB)),
+            Contact(initials = "SS", name =  "Sok Sok...", Color(0xFFFF2D7A)),
+            Contact(initials = "DK", name = "Dy Kosal", Color(0xFFFFB800)),
+            Contact(initials = "SP", name = "Seng Ph...", Color(0xFF6C2DFF)),
+            Contact(initials = "LK", name = "Leang K...", Color(0xFF2DB7D8)),
+            Contact(initials = "J", name = "Jack", Color(0xFF2DB7D8)),
+            Contact(initials = "J", name = "Jack", Color(0xFF2DB7D8)),
+            Contact(initials = "J", name = "Jack", Color(0xFF2DB7D8)),
+            Contact(initials = "J", name = "Jack", Color(0xFF2DB7D8))
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -534,11 +517,9 @@ fun RecentTransaction(
                 shape = RoundedCornerShape(size = 20.dp)
             )
     ){
-        LazyHorizontalGrid(
-            rows = GridCells.Fixed(count = 1),
+        LazyRow(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(97.dp),
+                .fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -597,7 +578,7 @@ fun ExploreService(){
                     width = 1.dp, color = Color.White
 
                 ),
-                shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(size = 20.dp)
             )
     ){
         LazyRow(
@@ -606,7 +587,7 @@ fun ExploreService(){
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ){
-            items(brands.size){ index ->
+            items(count = brands.size){ index ->
                val  brand = brands[index]
 
                 Column(
@@ -703,17 +684,39 @@ fun NewAndOffer(){
                 contentDescription = null
             )
         }
+        Row(
+            Modifier
+                .wrapContentHeight()
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            repeat(pagerState.pageCount) { iteration ->
+                val color = if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
+                Box(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .clip(CircleShape)
+                        .background(
+                            color
+                        )
+                        .size(4.dp)
+                )
+            }
+        }
+
+        }
     }
-}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Appearance (
-    onCostomize : () -> Unit
+    onCustomizeClick : () -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(124.dp)
             .padding(horizontal = 16.dp)
             .border(
                 border = BorderStroke(
@@ -729,9 +732,7 @@ fun Appearance (
                     start = 22.dp,
                     end = 18.dp
                 )
-                .padding(
-                    vertical = 16.dp
-                )
+                .padding(top = 16.dp)
         ) {
             Image(
                 painter = painterResource(R.drawable.img_apearance),
@@ -751,9 +752,6 @@ fun Appearance (
                     painter = painterResource(R.drawable.img_text),
                     contentDescription = null,
                     modifier = Modifier
-//                        .aspectRatio(
-//                            ratio = 69f / 63f
-//                        )
                         .size(
                             height = 69.dp,
                             width = 63.dp
@@ -765,10 +763,10 @@ fun Appearance (
                 )
                 Box (
                     modifier = Modifier
-                        .padding(top =16.dp)
+                        .padding(top = 16.dp)
                         .border(
                             border = BorderStroke(
-                                width = 1.dp , color = Color.White
+                                width = 1.dp, color = Color.White
                             ),
                             shape = RoundedCornerShape(20.dp)
                         )
@@ -778,7 +776,7 @@ fun Appearance (
                                 MutableInteractionSource()
                             },
                             indication = ripple(),
-                            onClick = onCostomize
+                            onClick = onCustomizeClick
                         )
                 ){
                     Text(
@@ -954,13 +952,6 @@ fun AppearanceBottomSheet() {
         }
     }
 }
-@Preview(showBackground = true)
-@Composable
-fun AppearanceBottomSheetPreview(){
-    AppearanceBottomSheet()
-
-}
-
 @Preview(showBackground = true)
 @Composable
 fun ScreenHomeDashBoardPreview(){

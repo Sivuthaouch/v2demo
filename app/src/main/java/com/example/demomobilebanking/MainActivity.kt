@@ -30,6 +30,10 @@ import com.example.demomobilebanking.ui.log_in.ScreenSetPin
 import com.example.demomobilebanking.ui.log_in.ScreenStart
 import com.example.demomobilebanking.ui.log_in.SetPIN
 import com.example.demomobilebanking.ui.theme.DemoMobileBankingTheme
+import com.example.demomobilebanking.ui.transfer.MenuTransfer
+import com.example.demomobilebanking.ui.transfer.ScreenMenuTransfer
+import com.example.demomobilebanking.ui.transfer.ScreenTransferToOwnAccount
+import com.example.demomobilebanking.ui.transfer.TransferToOwnAccount
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +41,7 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
         setContent {
-            val backstack = rememberNavBackStack(DashBoard) // For the first start screen. *OnBoarding Screen is the key first start screen
+            val backstack = rememberNavBackStack(TransferToOwnAccount) // For the first start screen. *OnBoarding Screen is the key first start screen
 
             NavDisplay(
                 backStack = backstack,
@@ -136,6 +140,12 @@ class MainActivity : ComponentActivity() {
                     }
                     entry <DashBoard>{
                         ScreenHomeDashBoard()
+                    }
+                    entry<MenuTransfer> {
+                        ScreenMenuTransfer()
+                    }
+                    entry<TransferToOwnAccount> {
+                        ScreenTransferToOwnAccount()
                     }
                 }
             )
