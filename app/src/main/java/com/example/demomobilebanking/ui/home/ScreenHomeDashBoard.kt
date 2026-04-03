@@ -1,6 +1,5 @@
 package com.example.demomobilebanking.ui.home
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -27,8 +26,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -36,7 +33,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -44,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,7 +51,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -72,18 +68,20 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data object DashBoard: NavKey
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenHomeDashBoard(
     modifier: Modifier = Modifier,
+    onTransferClicked : (DashBoardModel) -> Unit
     ){
-    var showSheet by remember { mutableStateOf(false) }
+    var showSheet by remember { mutableStateOf(value = false) }
     Box(
         modifier = modifier
             .fillMaxSize()
     ){
         Image(
-            painter = painterResource(R.drawable.img_background),
+            painter = painterResource(id = R.drawable.img_background),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -97,7 +95,9 @@ fun ScreenHomeDashBoard(
                 MainCard()
             }
             item {
-                DashBoardMenu()
+                DashBoardMenu(
+                    onTransferClicked = onTransferClicked
+                )
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
                     modifier = Modifier
@@ -124,7 +124,7 @@ fun ScreenHomeDashBoard(
                             fontSize = 14.sp
                         )
                         Icon(
-                            painter = painterResource(R.drawable.ic_arrowforward),
+                            painter = painterResource(id = R.drawable.ic_arrowforward),
                             contentDescription = null,
                             tint = Color(0xFFF5F9FF)
                         )
@@ -133,7 +133,7 @@ fun ScreenHomeDashBoard(
                 Spacer(modifier = Modifier.height(16.dp))
                 RecentTransaction(
                     contacts = listOf(
-                        Contact("HC", "Hean C...", Color(0xFF2D9CDB)),
+                        Contact(initials = "HC", name = "Hean C...", Color(0xFF2D9CDB)),
                         Contact("SS", "Sok Sok...", Color(0xFFFF2D7A)),
                         Contact("DK", "Dy Kosal", Color(0xFFFFB800)),
                         Contact("SP", "Seng Ph...", Color(0xFF6C2DFF)),
@@ -167,7 +167,7 @@ fun ScreenHomeDashBoard(
                             fontSize = 14.sp
                         )
                         Icon(
-                            painter = painterResource(R.drawable.ic_arrowforward),
+                            painter = painterResource(id = R.drawable.ic_arrowforward),
                             contentDescription = null,
                             tint = Color(0xFFF5F9FF)
                         )
@@ -191,7 +191,7 @@ fun ScreenHomeDashBoard(
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Icon(
-                        painter = painterResource(R.drawable.ic_option),
+                        painter = painterResource(id = R.drawable.ic_option),
                         contentDescription = "option",
                         tint = Color.Unspecified
                     )
@@ -243,10 +243,11 @@ fun ScreenHomeDashBoard(
 
 @Composable
 fun DashBoardMenu(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onTransferClicked: (DashBoardModel) -> Unit
 ){
     val items = remember {
-        arrayListOf(
+        mutableStateListOf(
             DashBoardModel(
                 id = "001",
                 label = "Account",
@@ -282,7 +283,7 @@ fun DashBoardMenu(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items.chunked(3).forEach { rowItems ->
+        items.chunked(size = 3).forEach { rowItems ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -290,18 +291,31 @@ fun DashBoardMenu(
                     Column(
                         modifier = Modifier
                             .weight(1f)
+                            .then(
+                                other = if (item.label == "Transfer") {
+                                    Modifier.clickable(
+                                        interactionSource = remember {
+                                            MutableInteractionSource()
+                                        },
+                                        indication = ripple(),
+                                        onClick = { onTransferClicked(item) }
+                                    )
+                                } else {
+                                    Modifier
+                                }
+                            )
                             .aspectRatio(ratio = 1f)
                             .border(
                                 border = BorderStroke(
                                     width = 1.dp, color = Color.White
                                 ),
-                                shape = RoundedCornerShape(20.dp)
+                                shape = RoundedCornerShape(size = 20.dp)
                             )
                         ,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
-                            painterResource(item.iconRes),
+                            painter = painterResource(id = item.iconRes),
                             contentDescription = null,
                             tint = Color.Unspecified,
                             modifier = Modifier
@@ -332,9 +346,8 @@ fun MainCard (){
 
         Column(
             modifier = Modifier
-//                .statusBarsPadding()
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(all = 16.dp)
                 .height(150.dp)
                 .border(
                     border = BorderStroke(
@@ -346,32 +359,30 @@ fun MainCard (){
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(all = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    modifier = Modifier
-                    ,
-                    painter = painterResource(R.drawable.ic_small_demo),
+                    painter = painterResource(id = R.drawable.ic_small_demo),
                     contentDescription = null,
                     tint = Color.Unspecified
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
                     modifier = Modifier.padding(),
-                    painter = painterResource(R.drawable.ic_phone_call),
+                    painter = painterResource(id = R.drawable.ic_phone_call),
                     contentDescription = "phone",
                     tint = Color.Unspecified
                 )
                 Icon(
                     modifier = Modifier.padding(start = 10.dp),
-                    painter = painterResource(R.drawable.ic_notification),
+                    painter = painterResource(id = R.drawable.ic_notification),
                     contentDescription = null,
                     tint = Color.Unspecified
                 )
                 Icon(
                     modifier = Modifier.padding(start = 10.dp),
-                    painter = painterResource(R.drawable.ic_bakong),
+                    painter = painterResource(id = R.drawable.ic_bakong),
                     contentDescription = null,
                     tint = Color.Unspecified,
                 )
@@ -413,9 +424,7 @@ fun MainCard (){
                             tint = Color.White
                         )
                     }
-                    Row(
-
-                    ) {
+                    Row {
                         Icon(
                             painter = painterResource(R.drawable.ic_riel),
                             contentDescription = null,
@@ -429,7 +438,7 @@ fun MainCard (){
                             modifier = Modifier.padding(start = 6.dp)
                         )
                     }
-                    Row() {
+                    Row {
                         Icon(
                             painter = painterResource(R.drawable.ic_currency_dollar),
                             contentDescription = null,
@@ -446,7 +455,6 @@ fun MainCard (){
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 SimpleDonutChart(
-
                     values = listOf(3000f, 3000f),
                     colors = listOf(Color(0xFFFF1477), Color(0xFFFFBD14))
                 )
@@ -454,6 +462,7 @@ fun MainCard (){
         }
     }
 }
+
 @Composable
 fun SimpleDonutChart(
     values: List<Float>,
@@ -485,25 +494,11 @@ fun SimpleDonutChart(
         }
     }
 }
+
 @Composable
 fun RecentTransaction(
     contacts: List<Contact>
 ){
-
-    val contacts = remember {
-        listOf(
-            Contact(initials = "Jack", name = "Jack", Color(0xFF2D9CDB)),
-            Contact(initials = "SS", name =  "Sok Sok...", Color(0xFFFF2D7A)),
-            Contact(initials = "DK", name = "Dy Kosal", Color(0xFFFFB800)),
-            Contact(initials = "SP", name = "Seng Ph...", Color(0xFF6C2DFF)),
-            Contact(initials = "LK", name = "Leang K...", Color(0xFF2DB7D8)),
-            Contact(initials = "J", name = "Jack", Color(0xFF2DB7D8)),
-            Contact(initials = "J", name = "Jack", Color(0xFF2DB7D8)),
-            Contact(initials = "J", name = "Jack", Color(0xFF2DB7D8)),
-            Contact(initials = "J", name = "Jack", Color(0xFF2DB7D8))
-        )
-    }
-
     Box(
         modifier = Modifier
             .height(97.dp)
@@ -512,7 +507,6 @@ fun RecentTransaction(
             .border(
                 border = BorderStroke(
                     width = 1.dp, color = Color.White
-
                 ),
                 shape = RoundedCornerShape(size = 20.dp)
             )
@@ -557,6 +551,7 @@ fun RecentTransaction(
         }
     }
 }
+
 @Composable
 fun ExploreService(){
     val brands = listOf(
@@ -605,7 +600,7 @@ fun ExploreService(){
                             modifier = Modifier
                                 .fillMaxSize(),
                             contentScale = ContentScale.Crop,
-                            painter = painterResource(brand.iconRes),
+                            painter = painterResource(id = brand.iconRes),
                             contentDescription = null
                         )
                     }
@@ -640,7 +635,7 @@ fun Promotion(){
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(promotions.size){ index ->
+        items(count = promotions.size){ index ->
             val promotion = promotions[index]
 
             Box(
@@ -651,16 +646,17 @@ fun Promotion(){
                 Image(
                     modifier = Modifier
                         .fillMaxSize(),
-                    painter = painterResource(promotion.img),
+                    painter = painterResource(id = promotion.img),
                     contentDescription = null
                 )
             }
         }
     }
 }
+
 @Composable
 fun NewAndOffer(){
-    val pagerState = rememberPagerState(pageCount = {4})
+    val pagerState = rememberPagerState(pageCount = { 4 })
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -675,12 +671,12 @@ fun NewAndOffer(){
             ),
             modifier = Modifier
                 .fillMaxSize()
-        ) { page ->
+        ) { _ ->
             Image(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxSize(),
-                painter = painterResource(R.drawable.img_new),
+                painter = painterResource(id = R.drawable.img_new),
                 contentDescription = null
             )
         }
@@ -692,11 +688,11 @@ fun NewAndOffer(){
                 .padding(bottom = 8.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            repeat(pagerState.pageCount) { iteration ->
+            repeat(times = pagerState.pageCount) { iteration ->
                 val color = if (pagerState.currentPage == iteration) Color.DarkGray else Color.LightGray
                 Box(
                     modifier = Modifier
-                        .padding(2.dp)
+                        .padding(all = 2.dp)
                         .clip(CircleShape)
                         .background(
                             color
@@ -722,7 +718,7 @@ fun Appearance (
                 border = BorderStroke(
                     width = 1.dp, color = Color.White
                 ),
-                shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(size = 20.dp)
             )
     ){
         Row(
@@ -735,7 +731,7 @@ fun Appearance (
                 .padding(top = 16.dp)
         ) {
             Image(
-                painter = painterResource(R.drawable.img_apearance),
+                painter = painterResource(id = R.drawable.img_apearance),
                 contentDescription = null,
                 modifier = Modifier
                     .aspectRatio(
@@ -749,7 +745,7 @@ fun Appearance (
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
-                    painter = painterResource(R.drawable.img_text),
+                    painter = painterResource(id = R.drawable.img_text),
                     contentDescription = null,
                     modifier = Modifier
                         .size(
@@ -768,7 +764,7 @@ fun Appearance (
                             border = BorderStroke(
                                 width = 1.dp, color = Color.White
                             ),
-                            shape = RoundedCornerShape(20.dp)
+                            shape = RoundedCornerShape(size = 20.dp)
                         )
                         .weight(1f)
                         .clickable(
@@ -803,8 +799,8 @@ fun AppearanceBottomSheet() {
     Column(
         modifier = Modifier
             .background(
-                color = Color(0xFF5F9FF),
-                shape = RoundedCornerShape(10.dp)
+                color = Color(0xFFF5F9FF),
+                shape = RoundedCornerShape(size = 10.dp)
             )
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
@@ -818,20 +814,20 @@ fun AppearanceBottomSheet() {
             fontWeight = FontWeight.W500,
             fontSize = 14.sp,
             modifier = Modifier
-                .padding(16.dp)
+                .padding(all = 16.dp)
         )
         Row(
             modifier = Modifier
                 .background(
                     color = Color.White,
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(size = 10.dp)
                 )
-                .padding(16.dp)
+                .padding(all = 16.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(35.5.dp, alignment = Alignment.CenterHorizontally)
         ) {
             Image(
-                painter = painterResource(R.drawable.img_defult_theme),
+                painter = painterResource(id = R.drawable.img_defult_theme),
                 contentDescription = null,
                 modifier = Modifier
                     .size(
@@ -952,10 +948,11 @@ fun AppearanceBottomSheet() {
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun ScreenHomeDashBoardPreview(){
     ScreenHomeDashBoard(
-
+        onTransferClicked = { _ -> }
     )
 }

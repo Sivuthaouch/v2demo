@@ -37,7 +37,9 @@ import kotlinx.serialization.Serializable
 data object FaceID : NavKey
 
 @Composable
-fun ScreenBiometry(){
+fun ScreenBiometry(
+    onFaceIDCompleted : () -> Unit
+){
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -93,7 +95,9 @@ fun ScreenBiometry(){
                 Text(text = "Not Now")
             }
             Button(
-                onClick = {},
+                onClick = {
+                    onFaceIDCompleted()
+                },
                 shape = RoundedCornerShape(size = 16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Blue,
@@ -117,5 +121,7 @@ fun ScreenBiometry(){
 @Preview(showBackground = true)
 @Composable
 fun ScreenBiometryPreview(){
-    ScreenBiometry()
+    ScreenBiometry(
+        onFaceIDCompleted = {}
+    )
 }

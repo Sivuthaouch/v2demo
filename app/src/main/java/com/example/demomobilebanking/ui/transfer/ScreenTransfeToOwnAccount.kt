@@ -3,6 +3,9 @@ package com.example.demomobilebanking.ui.transfer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,8 +22,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -56,15 +61,17 @@ data object TransferToOwnAccount : NavKey
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenTransferToOwnAccount(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onTransferSuccess : () -> Unit
 ) {
-    var showSheet by remember { mutableStateOf(false) }
+    var showSheet by remember { mutableStateOf(value = false) }
+    rememberScrollState()
     Box(
         modifier = modifier
             .fillMaxSize()
     ){
         Image(
-            painter = painterResource(R.drawable.img_background),
+            painter = painterResource(id = R.drawable.img_background),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds
@@ -81,7 +88,7 @@ fun ScreenTransferToOwnAccount(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_angle_back),
+                    painter = painterResource(id = R.drawable.ic_angle_back),
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier
@@ -97,7 +104,7 @@ fun ScreenTransferToOwnAccount(
                         .padding(start = 72.dp)
                 )
             }
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
@@ -105,10 +112,9 @@ fun ScreenTransferToOwnAccount(
                     ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                item {
                     Spacer(modifier = Modifier.height(30.dp))
                     Icon(
-                        painter = painterResource(R.drawable.ic_transfer_big),
+                        painter = painterResource(id = R.drawable.ic_transfer_big),
                         contentDescription = null,
                         tint = Color.Unspecified,
                         modifier = Modifier
@@ -135,17 +141,16 @@ fun ScreenTransferToOwnAccount(
                                         MutableInteractionSource()
                                     },
                                     indication = ripple(),
-                                    onClick = { showSheet = true}
-                                )
-                            ,
-                            shape = RoundedCornerShape(10.dp),
+                                    onClick = { showSheet = true }
+                                ),
+                            shape = RoundedCornerShape(size = 10.dp),
                             value = "",
                             onValueChange = {
 
                             },
                             leadingIcon = {
                                 Icon(
-                                    painter = painterResource(R.drawable.ic_wallet),
+                                    painter = painterResource(id = R.drawable.ic_wallet),
                                     contentDescription = null
                                 )
                             },
@@ -156,7 +161,7 @@ fun ScreenTransferToOwnAccount(
                             },
                             trailingIcon = {
                                 Icon(
-                                    painter = painterResource(R.drawable.ic_arrowdown),
+                                    painter = painterResource(id = R.drawable.ic_arrowdown),
                                     contentDescription = null
                                 )
                             },
@@ -165,26 +170,24 @@ fun ScreenTransferToOwnAccount(
                             ),
                             enabled = false
                         )
-                        if (showSheet){
-                            ModalBottomSheet(
-                                onDismissRequest = { showSheet = false},
-                                dragHandle = {}
-                            ) {
-                                AccountBottomSheet()
-                            }
+                        if (showSheet) {
+                            AccountBottomSheet(
+                                onDismissRequest = {
+                                    showSheet = false
+                                },
+                            )
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         OutlinedTextField(
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(size = 10.dp),
                             value = "",
                             onValueChange = {},
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                            ,
+                                .padding(horizontal = 16.dp),
                             leadingIcon = {
                                 Icon(
-                                    painter = painterResource(R.drawable.ic_currency_dollar__1_),
+                                    painter = painterResource(id = R.drawable.ic_currency_dollar__1_),
                                     contentDescription = null
                                 )
                             },
@@ -200,16 +203,15 @@ fun ScreenTransferToOwnAccount(
                         )
                         Spacer(modifier = Modifier.height(10.dp))
                         OutlinedTextField(
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(size = 10.dp),
                             value = "",
                             onValueChange = {},
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                            ,
+                                .padding(horizontal = 16.dp),
                             leadingIcon = {
                                 Icon(
-                                    painter = painterResource(R.drawable.ic_pencil_simple_line),
+                                    painter = painterResource(id = R.drawable.ic_pencil_simple_line),
                                     contentDescription = null
                                 )
                             },
@@ -224,7 +226,7 @@ fun ScreenTransferToOwnAccount(
                             },
                             trailingIcon = {
                                 Icon(
-                                    painter = painterResource(R.drawable.ic_arrowdown),
+                                    painter = painterResource(id = R.drawable.ic_arrowdown),
                                     contentDescription = null
                                 )
                             }
@@ -235,15 +237,15 @@ fun ScreenTransferToOwnAccount(
                             fontWeight = FontWeight.W500,
                             modifier = Modifier
                                 .align(Alignment.Start)
-                                .padding(16.dp)
+                                .padding(all = 16.dp)
                         )
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(all = 16.dp)
                                 .background(
                                     color = Color(0xFFF5F5F5),
-                                    shape = RoundedCornerShape(6.dp)
+                                    shape = RoundedCornerShape(size = 6.dp)
                                 ),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
@@ -298,53 +300,51 @@ fun ScreenTransferToOwnAccount(
                                 )
                             }
                         }
-                }
-
-                }
-                item {  Box(
+                    }
+                Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(all = 16.dp)
+                        .clickable(
+                            interactionSource = remember {
+                                MutableInteractionSource()
+                            },
+                            indication = ripple(),
+                            onClick = onTransferSuccess
+                        )
                         .navigationBarsPadding()
                         .height(height = 60.dp)
                         .background(
                             shape = RoundedCornerShape(size = 16.dp),
                             brush = Brush.verticalGradient(
                                 colors = listOf(
-                                    Color(
-                                        color = 0xFF1A6FFF
-                                    ),
-                                    Color(
-                                        color = 0xFF002F80
-                                    ),
+                                    Color(0xFF1A6FFF),
+                                    Color(0xFF002F80)
                                 )
                             )
                         )
-                    ){
-                        Text(
-                            text = "Transfer",
-                            fontWeight = FontWeight.W700,
-                            fontSize = 18.sp,
-                            textAlign = TextAlign.Center,
-                            color = Color.White
-                        )
-                    } }
-
+                ){
+                    Text(
+                        text = "Transfer",
+                        fontWeight = FontWeight.W700,
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color.White
+                    )
+                }
             }
-
-
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAccountField(
     modifier: Modifier = Modifier,
-
 ){
-    var showSheet by remember { mutableStateOf(false) }
+    var showSheet by remember { mutableStateOf(value = false) }
     Column(
         modifier = modifier
             .fillMaxWidth(),
@@ -361,14 +361,14 @@ fun SelectAccountField(
                     onClick = { showSheet = true}
                 )
                 ,
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(size = 10.dp),
             value = "",
             onValueChange = {
 
             },
             leadingIcon = {
                 Icon(
-                    painter = painterResource(R.drawable.ic_wallet),
+                    painter = painterResource(id =R.drawable.ic_wallet),
                     contentDescription = null
                 )
             },
@@ -379,7 +379,7 @@ fun SelectAccountField(
             },
             trailingIcon = {
                 Icon(
-                    painter = painterResource(R.drawable.ic_arrowdown),
+                    painter = painterResource(id = R.drawable.ic_arrowdown),
                     contentDescription = null
                 )
             },
@@ -390,143 +390,156 @@ fun SelectAccountField(
         )
 
         if (showSheet){
-            ModalBottomSheet(
-                onDismissRequest = { showSheet = false},
-                dragHandle = {}
-            ) {
-                AccountBottomSheet()
-            }
+            AccountBottomSheet(
+                onDismissRequest = {
+                    showSheet = false
+                }
+            )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountBottomSheet(
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val accountList = listOf(
         Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Mobile Savings Account", labelColor = Color(0xFF004CCC)),
-        Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Mobile Savings Account",labelColor = Color(0xFFFFBD14)),
-        Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Mobile Savings Account",labelColor = Color(0xFFFF1477))
+        Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Mobile Fixed Deposit",labelColor = Color(0xFFFFBD14)),
+        Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Indiviual Internet Banking",labelColor = Color(0xFFFF1477)),
+        Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Mobile Fixed Deposit",labelColor = Color(0xFFFFBD14)),
+        Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Mobile Fixed Deposit",labelColor = Color(0xFFFFBD14)),
+        Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Mobile Fixed Deposit",labelColor = Color(0xFFFFBD14)),
+        Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Mobile Fixed Deposit",labelColor = Color(0xFFFFBD14)),
+        Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Mobile Fixed Deposit",labelColor = Color(0xFFFFBD14)),
+        Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Mobile Fixed Deposit",labelColor = Color(0xFFFFBD14)),
+        Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Mobile Fixed Deposit",labelColor = Color(0xFFFFBD14)),
+        Account(id = "001", name = "HEAN CHANTREA", accountNumber = "001 001 111", accountBalance = "200.00 USD", accountType = "Mobile Fixed Deposit",labelColor = Color(0xFFFFBD14)),
     )
-    Column(
-        modifier = modifier
-            .background(
-                color = Color(0xFFF5F9FF),
-                shape = RoundedCornerShape(10.dp)
-            )
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth()
-            .height(354.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-        Spacer(modifier = Modifier.height(14.dp))
-        Box(
-            modifier = Modifier
-                .width(34.dp)
-                .height(3.dp)
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest
+    ) {
+        Column(
+            modifier = modifier
                 .background(
-                    color = Color(0xFF999999)
+                    color = Color(0xFFF5F9FF),
+                    shape = RoundedCornerShape(size = 10.dp)
                 )
-        )
-
-        Text(
-            text = "Select your account",
-            fontWeight = FontWeight.W700,
-            fontSize = 16.sp,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(top = 32.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        LazyColumn(
-            modifier = Modifier
+                .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(accountList.size) { index ->
-                val account = accountList[index]
+            Spacer(modifier = Modifier.height(14.dp))
+            Box(
+                modifier = Modifier
+                    .width(34.dp)
+                    .height(3.dp)
+                    .background(
+                        color = Color(0xFF999999)
+                    )
+            )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = Color.White,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .height(
-                            intrinsicSize = IntrinsicSize.Max
-                        )
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .width(8.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(weight = 1f)
-                                .background(
-                                    color = Color(0xFFE5E5E5),
-                                    shape = RoundedCornerShape(topStart = 8.dp)
-                                )
-                                .fillMaxWidth()
+            Text(
+                text = "Select your account",
+                fontWeight = FontWeight.W700,
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(top = 32.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(count = accountList.size) { index ->
+                    val account = accountList[index]
 
-                        )
-                        Box(
-                            modifier = Modifier
-                                .weight(0.5f)
-                                .background(
-                                    color = account.labelColor,
-                                    shape = RoundedCornerShape(bottomStart = 8.dp)
-                                )
-                                .fillMaxWidth()
-                        )
-                    }
-                    Column(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(
-                                vertical = 8.dp
+                            .background(
+                                color = Color.White,
+                                shape = RoundedCornerShape(size = 8.dp)
                             )
-                            .padding(start = 12.dp)
+                            .height(
+                                intrinsicSize = IntrinsicSize.Max
+                            )
                     ) {
-                        Text(
-                            text = account.name,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.W400,
-                            color = Color.Blue,
+                        Column(
                             modifier = Modifier
-                        )
-                        Row(
+                                .width(8.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .weight(weight = 1f)
+                                    .background(
+                                        color = Color(0xFFE5E5E5),
+                                        shape = RoundedCornerShape(topStart = 8.dp)
+                                    )
+                                    .fillMaxWidth()
+
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .weight(0.5f)
+                                    .background(
+                                        color = account.labelColor,
+                                        shape = RoundedCornerShape(bottomStart = 8.dp)
+                                    )
+                                    .fillMaxWidth()
+                            )
+                        }
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .padding(
+                                    vertical = 8.dp
+                                )
+                                .padding(start = 12.dp)
                         ) {
                             Text(
-                                text = account.accountNumber,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.W400,
-                                modifier = Modifier
-                                    .padding(vertical = 4.dp)
-                            )
-                            Text(
-                                text = account.accountBalance,
+                                text = account.name,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.W400,
                                 color = Color.Blue,
                                 modifier = Modifier
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = account.accountNumber,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.W400,
+                                    modifier = Modifier
+                                        .padding(vertical = 4.dp)
+                                )
+                                Text(
+                                    text = account.accountBalance,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.W400,
+                                    color = Color.Blue,
+                                    modifier = Modifier
+                                        .padding(vertical = 4.dp)
+                                )
+                            }
+                            Text(
+                                text = account.accountType,
+                                modifier = Modifier
+                                    .background(
+                                        color = account.labelColor,
+                                        shape = RoundedCornerShape(size = 4.dp)
+                                    )
                                     .padding(vertical = 4.dp)
+                                    .padding(horizontal = 6.dp),
+                                color = Color.White
                             )
                         }
-                        Text(
-                            text = account.accountType,
-                            modifier = Modifier
-                                .background(
-                                    color = account.labelColor,
-                                    shape = RoundedCornerShape(4.dp)
-                                )
-                                .padding(vertical = 4.dp)
-                                .padding(horizontal = 6.dp)
-                        )
                     }
                 }
             }
@@ -539,5 +552,7 @@ fun AccountBottomSheet(
 @Preview(showBackground = true)
 @Composable
 private fun ScreenTransferToOwnAccountPreview () {
-    ScreenTransferToOwnAccount()
+    ScreenTransferToOwnAccount(
+        onTransferSuccess = {}
+    )
 }

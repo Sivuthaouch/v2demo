@@ -34,7 +34,9 @@ import com.example.demomobilebanking.ui.transfer.ConfirmTransfer
 import com.example.demomobilebanking.ui.transfer.MenuTransfer
 import com.example.demomobilebanking.ui.transfer.ScreenConfirmTransfer
 import com.example.demomobilebanking.ui.transfer.ScreenMenuTransfer
+import com.example.demomobilebanking.ui.transfer.ScreenSuccessfulTransfer
 import com.example.demomobilebanking.ui.transfer.ScreenTransferToOwnAccount
+import com.example.demomobilebanking.ui.transfer.SuccessfulTransfer
 import com.example.demomobilebanking.ui.transfer.TransferToOwnAccount
 
 class MainActivity : ComponentActivity() {
@@ -43,7 +45,7 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
         setContent {
-            val backstack = rememberNavBackStack(ConfirmTransfer) // For the first start screen. *OnBoarding Screen is the key first start screen
+            val backstack = rememberNavBackStack(DashBoard) // For the first start screen. *OnBoarding Screen is the key first start screen
 
             NavDisplay(
                 backStack = backstack,
@@ -108,7 +110,13 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     entry<FaceID>{
-                        ScreenBiometry()
+                        ScreenBiometry(
+                            onFaceIDCompleted = {
+                                backstack.add(
+                                    element = DashBoard
+                                )
+                            }
+                        )
                     }
                     entry<RepeatPIN>{
                         ScreenRepeatPIN(
@@ -138,19 +146,65 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     entry <ResetPWSuccess>{
-                        ScreenResult()
+                        ScreenResult(
+                        )
                     }
                     entry <DashBoard>{
-                        ScreenHomeDashBoard()
+                        ScreenHomeDashBoard(
+                            onTransferClicked = {
+                                backstack.add(
+                                    element = MenuTransfer
+                                )
+                            }
+                        )
                     }
                     entry<MenuTransfer> {
-                        ScreenMenuTransfer()
+                        ScreenMenuTransfer(
+                            onTransferToOwnAccountClicked = {
+                                backstack.add(
+                                    element = TransferToOwnAccount
+                                )
+                            }
+                        )
                     }
                     entry<TransferToOwnAccount> {
-                        ScreenTransferToOwnAccount()
+                        ScreenTransferToOwnAccount(
+                            onTransferSuccess = {
+                                backstack.add(
+                                    element = ConfirmTransfer
+                                )
+                            }
+                        )
                     }
                     entry<ConfirmTransfer> {
-                        ScreenConfirmTransfer()
+                        ScreenConfirmTransfer(
+                            onConfirmSuccess = {
+                                backstack.add(
+                                    element = SuccessfulTransfer
+                                )
+                            }
+                        )
+                    }
+                    entry<SuccessfulTransfer> {
+                        ScreenSuccessfulTransfer(
+                            onBackToAccount = {
+//                                backstack.remove(
+//                                    element = SuccessfulTransfer
+//                                )
+//                                backstack.remove(
+//                                    element = ConfirmTransfer
+//                                )
+//                                backstack.remove(
+//                                    element = TransferToOwnAccount
+//                                )
+//                                backstack.remove(
+//                                    element = MenuTransfer
+//                                )
+                                backstack.removeIf { entry ->
+                                    entry !is DashBoard
+                                }
+                            }
+                        )
                     }
                 }
             )
